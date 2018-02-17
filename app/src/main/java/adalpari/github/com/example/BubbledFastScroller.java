@@ -2,18 +2,26 @@ package adalpari.github.com.example;
 
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
+import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.AttributeSet;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /**
  * Created by Adalberto Plaza on 17/02/2018.
  */
 
-public class BubbledFastScroller {
+public class BubbledFastScroller extends RelativeLayout {
+
     private RecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
     private ImageView imageThumb;
@@ -23,8 +31,8 @@ public class BubbledFastScroller {
     private volatile int oldScrollState = RecyclerView.SCROLL_STATE_IDLE;
     private volatile boolean hidingThumb = true;
 
-    private final AnimatorSet animShow;
-    private final AnimatorSet animHide;
+    private AnimatorSet animShow;
+    private AnimatorSet animHide;
 
     private FastScrollerProvider provider;
 
@@ -32,21 +40,49 @@ public class BubbledFastScroller {
         String getPositionTitle(int position);
     }
 
-    public BubbledFastScroller(FastScrollerProvider provider, RecyclerView recyclerView, final ImageView thumb, final TextView bubble) {
-        this.provider = provider;
-        this.recyclerView = recyclerView;
-        this.layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-        this.imageThumb = thumb;
-        this.textBubble = bubble;
+    public BubbledFastScroller(Context context) {
+        super(context);
+        initViews(context);
+    }
 
+    public BubbledFastScroller(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        initViews(context);
+    }
+
+    public BubbledFastScroller(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        initViews(context);
+    }
+
+    public BubbledFastScroller(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
+        initViews(context);
+    }
+
+    private void initViews(Context context) {
+        initAnimations();
+        initRecyclerView(context);
+        initRecyclerViewListener();
+        initThumb(context);
+        initBubble(context);
+        initThumbListener();
+    }
+
+    private void initAnimations() {
         animShow = (AnimatorSet) AnimatorInflater.loadAnimator(recyclerView.getContext(), R.animator.show);
         animShow.setTarget(imageThumb);
         animHide = (AnimatorSet) AnimatorInflater.loadAnimator(recyclerView.getContext(), R.animator.hide);
         animHide.setStartDelay(1000);
         animHide.setTarget(imageThumb);
+    }
 
-        initRecyclerViewListener();
-        initThumbListener();
+    //TODO: check if one can pass the attributes (check with layoutmanager)
+    private void initRecyclerView(Context context) {
+        this.recyclerView = new RecyclerView(context);
+        recyclerView.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        this.addView(recyclerView);
     }
 
     private void initRecyclerViewListener() {
@@ -69,6 +105,76 @@ public class BubbledFastScroller {
                 }
             }
         });
+    }
+
+    private void initThumb(Context context) {
+        this.imageThumb = new ImageView(context);
+        textBubble.setGravity(Gravity.RIGHT);
+        textBubble.setLayoutParams(createThumbLayoutParams(context));
+
+        GradientDrawable thumbBackground = getThumbBackground();
+        if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+            textBubble.setBackgroundDrawable(thumbBackground);
+        } else {
+            textBubble.setBackground(thumbBackground);
+        }
+    }
+
+    private RelativeLayout.LayoutParams createThumbLayoutParams(Context context) {
+        int width = context.getResources().getDimensionPixelOffset(R.dimen.thumb_width);;
+        int height = context.getResources().getDimensionPixelOffset(R.dimen.thumb_height);;
+        final RelativeLayout.LayoutParams layoutParams = new LayoutParams(width, height);
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+
+        int marginInPx = context.getResources().getDimensionPixelOffset(R.dimen.thumb_margin);
+        layoutParams.setMargins(0, 0, marginInPx, 0);
+    }
+
+    private GradientDrawable getThumbBackground() {
+        GradientDrawable roundedBackground = new GradientDrawable();
+        roundedBackground.setShape(GradientDrawable.RECTANGLE);
+        roundedBackground.setCornerRadii(new float[] { 20, 20, 20, 20, 20, 20, 0, 0 });
+//        roundedBackground.setColor(numberCounterColor);
+
+        return roundedBackground;
+    }
+
+    private void initBubble(Context context) {
+        int paddingInPx = context.getResources().getDimensionPixelOffset(R.dimen.bubble_padding);
+
+        textBubble = new TextView(context);
+
+        textBubble.setPadding(paddingInPx, paddingInPx, paddingInPx, paddingInPx);
+        textBubble.setGravity(Gravity.RIGHT);
+        textBubble.setLayoutParams(createBubbleLayoutParams(context));
+        textBubble.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+//        textBubble.setTextColor(numberCounterTextColor);
+
+        GradientDrawable roundedBackground = getBubbleBackground();
+        if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+            textBubble.setBackgroundDrawable(roundedBackground);
+        } else {
+            textBubble.setBackground(roundedBackground);
+        }
+
+        this.addView(textBubble);
+    }
+
+    private RelativeLayout.LayoutParams createBubbleLayoutParams(Context context) {
+        final RelativeLayout.LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+
+        int marginInPx = context.getResources().getDimensionPixelOffset(R.dimen.bubble_margin);
+        layoutParams.setMargins(0, 0, marginInPx, 0);
+    }
+
+    private GradientDrawable getBubbleBackground() {
+        GradientDrawable roundedBackground = new GradientDrawable();
+        roundedBackground.setShape(GradientDrawable.RECTANGLE);
+        roundedBackground.setCornerRadii(new float[] { 20, 20, 20, 20, 20, 20, 0, 0 });
+//        roundedBackground.setColor(numberCounterColor);
+
+        return roundedBackground;
     }
 
     private void initThumbListener() {

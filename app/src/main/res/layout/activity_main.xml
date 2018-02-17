@@ -7,8 +7,9 @@
     tools:context="adalpari.github.com.example.MainActivity">
 
 
-    <android.support.v7.widget.RecyclerView
+    <adalpari.github.com.example.BubbledFastScroller
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
 </RelativeLayout>
