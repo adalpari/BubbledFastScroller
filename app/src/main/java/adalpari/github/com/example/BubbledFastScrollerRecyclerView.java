@@ -20,10 +20,10 @@ import android.widget.TextView;
  * Created by Adalberto Plaza on 17/02/2018.
  */
 
-public class BubbledFastScroller extends RelativeLayout {
+public class BubbledFastScrollerRecyclerView extends RelativeLayout {
 
     private RecyclerView recyclerView;
-    private LinearLayoutManager layoutManager;
+    private RecyclerView.LayoutManager layoutManager;
     private ImageView imageThumb;
     private TextView textBubble;
 
@@ -40,28 +40,28 @@ public class BubbledFastScroller extends RelativeLayout {
         String getPositionTitle(int position);
     }
 
-    public BubbledFastScroller(Context context) {
+    public BubbledFastScrollerRecyclerView(Context context) {
         super(context);
         initViews(context);
     }
 
-    public BubbledFastScroller(Context context, AttributeSet attrs) {
+    public BubbledFastScrollerRecyclerView(Context context, AttributeSet attrs) {
         super(context, attrs);
         initViews(context);
     }
 
-    public BubbledFastScroller(Context context, AttributeSet attrs, int defStyleAttr) {
+    public BubbledFastScrollerRecyclerView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initViews(context);
     }
 
-    public BubbledFastScroller(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public BubbledFastScrollerRecyclerView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         initViews(context);
     }
 
     private void initViews(Context context) {
-        initAnimations();
+        initAnimations(context);
         initRecyclerView(context);
         initRecyclerViewListener();
         initThumb(context);
@@ -69,10 +69,10 @@ public class BubbledFastScroller extends RelativeLayout {
         initThumbListener();
     }
 
-    private void initAnimations() {
-        animShow = (AnimatorSet) AnimatorInflater.loadAnimator(recyclerView.getContext(), R.animator.show);
+    private void initAnimations(Context context) {
+        animShow = (AnimatorSet) AnimatorInflater.loadAnimator(context, R.animator.show);
         animShow.setTarget(imageThumb);
-        animHide = (AnimatorSet) AnimatorInflater.loadAnimator(recyclerView.getContext(), R.animator.hide);
+        animHide = (AnimatorSet) AnimatorInflater.loadAnimator(context, R.animator.hide);
         animHide.setStartDelay(1000);
         animHide.setTarget(imageThumb);
     }
@@ -81,7 +81,6 @@ public class BubbledFastScroller extends RelativeLayout {
     private void initRecyclerView(Context context) {
         this.recyclerView = new RecyclerView(context);
         recyclerView.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
         this.addView(recyclerView);
     }
 
@@ -109,14 +108,13 @@ public class BubbledFastScroller extends RelativeLayout {
 
     private void initThumb(Context context) {
         this.imageThumb = new ImageView(context);
-        textBubble.setGravity(Gravity.RIGHT);
-        textBubble.setLayoutParams(createThumbLayoutParams(context));
+        imageThumb.setLayoutParams(createThumbLayoutParams(context));
 
         GradientDrawable thumbBackground = getThumbBackground();
         if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-            textBubble.setBackgroundDrawable(thumbBackground);
+            imageThumb.setBackgroundDrawable(thumbBackground);
         } else {
-            textBubble.setBackground(thumbBackground);
+            imageThumb.setBackground(thumbBackground);
         }
     }
 
@@ -128,6 +126,8 @@ public class BubbledFastScroller extends RelativeLayout {
 
         int marginInPx = context.getResources().getDimensionPixelOffset(R.dimen.thumb_margin);
         layoutParams.setMargins(0, 0, marginInPx, 0);
+
+        return layoutParams;
     }
 
     private GradientDrawable getThumbBackground() {
@@ -166,6 +166,8 @@ public class BubbledFastScroller extends RelativeLayout {
 
         int marginInPx = context.getResources().getDimensionPixelOffset(R.dimen.bubble_margin);
         layoutParams.setMargins(0, 0, marginInPx, 0);
+
+        return layoutParams;
     }
 
     private GradientDrawable getBubbleBackground() {
@@ -234,9 +236,9 @@ public class BubbledFastScroller extends RelativeLayout {
 
     private void fillBubble() {
         if (provider != null && textBubble != null) {
-            String text = provider.getPositionTitle(layoutManager.findLastCompletelyVisibleItemPosition());
-            textBubble.setVisibility(View.VISIBLE);
-            textBubble.setText(text);
+//            String text = provider.getPositionTitle(layoutManager.findLastCompletelyVisibleItemPosition());
+//            textBubble.setVisibility(View.VISIBLE);
+//            textBubble.setText(text);
         }
     }
 
@@ -286,6 +288,19 @@ public class BubbledFastScroller extends RelativeLayout {
         float value = relativePos * recyclerView.getHeight() - imageThumb.getHeight();
         imageThumb.setY(getValueInRange(0, max, value));
         textBubble.setY(getValueInRange(0, max, value));
+    }
+
+    public void setAdapter(RecyclerView.Adapter adapter) {
+        recyclerView.setAdapter(adapter);
+    }
+
+    public void setLayoutManager(RecyclerView.LayoutManager layoutManager) {
+        recyclerView.setLayoutManager(layoutManager);
+        this.layoutManager = layoutManager;
+    }
+
+    public RecyclerView getRecyclerView() {
+        return recyclerView;
     }
 
     public void onDestroy() {
