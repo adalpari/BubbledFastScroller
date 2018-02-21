@@ -67,12 +67,12 @@ public class BubbledFastScrollerRecyclerViewHandler extends RelativeLayout {
     }
 
     private void initViews(Context context, AttributeSet attrs) {
-        initAnimations(context);
         initColors(context, attrs);
         initRecyclerView(context);
         initRecyclerViewListener();
         initThumb(context);
         initBubble(context);
+        initAnimations(context);
         initThumbListener();
     }
 
