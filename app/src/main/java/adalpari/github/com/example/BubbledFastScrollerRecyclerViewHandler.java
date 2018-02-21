@@ -41,16 +41,12 @@ public class BubbledFastScrollerRecyclerViewHandler extends RelativeLayout {
     private int bubbleTextColor = Color.WHITE;
 
     private FastScrollerInfoProvider fastScrollerInfoProvider;
-    private OnScrolledListener onScrolledListener;
+    private RecyclerView.OnScrollListener externalOnScrollListener;
 
     public interface FastScrollerInfoProvider {
         String getPositionTitle(int position);
     }
 
-    public interface OnScrolledListener {
-        void onScrollStateChanged(RecyclerView recyclerView, int newScrollState);
-        void onScrolled(RecyclerView recyclerView, int dx, int dy);
-    }
 
     public BubbledFastScrollerRecyclerViewHandler(Context context) {
         super(context);
@@ -122,8 +118,8 @@ public class BubbledFastScrollerRecyclerViewHandler extends RelativeLayout {
                 }
                 oldScrollState = newScrollState;
 
-                if (onScrolledListener != null) {
-                    onScrolledListener.onScrollStateChanged(recyclerView, newScrollState);
+                if (externalOnScrollListener != null) {
+                    externalOnScrollListener.onScrollStateChanged(recyclerView, newScrollState);
                 }
             }
 
@@ -134,8 +130,8 @@ public class BubbledFastScrollerRecyclerViewHandler extends RelativeLayout {
                     updateHandlePosition(recyclerView);
                 }
 
-                if (onScrolledListener != null) {
-                    onScrolledListener.onScrolled(recyclerView, dx, dy);
+                if (externalOnScrollListener != null) {
+                    externalOnScrollListener.onScrolled(recyclerView, dx, dy);
                 }
             }
         });
@@ -390,8 +386,8 @@ public class BubbledFastScrollerRecyclerViewHandler extends RelativeLayout {
         this.fastScrollerInfoProvider = fastScrollerInfoProvider;
     }
 
-    public void setOnScrolledListener(OnScrolledListener onScrolledListener) {
-        this.onScrolledListener = onScrolledListener;
+    public void setOnScrolledListener(RecyclerView.OnScrollListener onScrolledListener) {
+        this.externalOnScrollListener = onScrolledListener;
     }
 
     public void onDestroy() {
@@ -399,6 +395,16 @@ public class BubbledFastScrollerRecyclerViewHandler extends RelativeLayout {
         imageThumb = null;
         textBubble = null;
         fastScrollerInfoProvider = null;
+
+        animShow.cancel();
+        animShow.end();
+        animShow = null;
+        animHide.cancel();
+        animHide.end();
+        animHide = null;
+
+        fastScrollerInfoProvider = null;
+        externalOnScrollListener = null;
     }
 }
 
