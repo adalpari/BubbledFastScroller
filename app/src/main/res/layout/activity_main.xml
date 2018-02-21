@@ -3,13 +3,16 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="match_parent" xmlns:custom="http://schemas.android.com/apk/res-auto"
     tools:context="adalpari.github.com.example.MainActivity">
 
 
     <adalpari.github.com.example.BubbledFastScrollerRecyclerViewHandler
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        custom:bfs_thumb_color="#494949"
+        custom:bfs_bubble_color="#909090"
+        custom:bfs_text_color="#ffffff"/>
 
 </RelativeLayout>

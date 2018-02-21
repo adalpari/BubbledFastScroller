@@ -3,6 +3,7 @@ package adalpari.github.com.example;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.support.v7.widget.OrientationHelper;
@@ -35,6 +36,10 @@ public class BubbledFastScrollerRecyclerViewHandler extends RelativeLayout {
     private AnimatorSet animShow;
     private AnimatorSet animHide;
 
+    private int thumbColor = Color.GRAY;
+    private int bubbleColor = Color.GRAY;
+    private int bubbleTextColor = Color.WHITE;
+
     private FastScrollerInfoProvider fastScrollerInfoProvider;
 
     public interface FastScrollerInfoProvider {
@@ -43,26 +48,27 @@ public class BubbledFastScrollerRecyclerViewHandler extends RelativeLayout {
 
     public BubbledFastScrollerRecyclerViewHandler(Context context) {
         super(context);
-        initViews(context);
+        initViews(context, null);
     }
 
     public BubbledFastScrollerRecyclerViewHandler(Context context, AttributeSet attrs) {
         super(context, attrs);
-        initViews(context);
+        initViews(context, attrs);
     }
 
     public BubbledFastScrollerRecyclerViewHandler(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        initViews(context);
+        initViews(context, attrs);
     }
 
     public BubbledFastScrollerRecyclerViewHandler(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        initViews(context);
+        initViews(context, attrs);
     }
 
-    private void initViews(Context context) {
+    private void initViews(Context context, AttributeSet attrs) {
         initAnimations(context);
+        initColors(context, attrs);
         initRecyclerView(context);
         initRecyclerViewListener();
         initThumb(context);
@@ -76,6 +82,21 @@ public class BubbledFastScrollerRecyclerViewHandler extends RelativeLayout {
         animHide = (AnimatorSet) AnimatorInflater.loadAnimator(context, R.animator.hide);
         animHide.setStartDelay(1000);
         animHide.setTarget(imageThumb);
+    }
+
+    private void initColors(Context context, AttributeSet attrs) {
+        if (context != null && attrs != null) {
+            TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.BubbledFastScroller);
+
+            try {
+                thumbColor = a.getColor(R.styleable.BubbledFastScroller_bfs_thumb_color, Color.GRAY);
+                bubbleColor = a.getColor(R.styleable.BubbledFastScroller_bfs_bubble_color, Color.GRAY);
+                bubbleTextColor = a.getColor(R.styleable.BubbledFastScroller_bfs_text_color, Color.WHITE);
+            } catch (Throwable throwable) {
+            } finally {
+                a.recycle();
+            }
+        }
     }
 
     //TODO: check if one can pass the attributes (check with layoutmanager)
@@ -138,7 +159,7 @@ public class BubbledFastScrollerRecyclerViewHandler extends RelativeLayout {
         GradientDrawable roundedBackground = new GradientDrawable();
         roundedBackground.setShape(GradientDrawable.RECTANGLE);
         roundedBackground.setCornerRadii(new float[] { 20, 20, 20, 20, 20, 20, 20, 20 });
-        roundedBackground.setColor(Color.BLUE);
+        roundedBackground.setColor(thumbColor);
 
         return roundedBackground;
     }
@@ -152,7 +173,7 @@ public class BubbledFastScrollerRecyclerViewHandler extends RelativeLayout {
         textBubble.setGravity(Gravity.RIGHT);
         textBubble.setLayoutParams(createBubbleLayoutParams(context));
         textBubble.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-        textBubble.setTextColor(Color.WHITE);
+        textBubble.setTextColor(bubbleTextColor);
         textBubble.setVisibility(View.GONE);
 
         GradientDrawable roundedBackground = getBubbleBackground();
@@ -179,7 +200,7 @@ public class BubbledFastScrollerRecyclerViewHandler extends RelativeLayout {
         GradientDrawable roundedBackground = new GradientDrawable();
         roundedBackground.setShape(GradientDrawable.RECTANGLE);
         roundedBackground.setCornerRadii(new float[] { 20, 20, 20, 20, 0, 0, 20, 20 });
-        roundedBackground.setColor(Color.BLUE);
+        roundedBackground.setColor(bubbleColor);
 
         return roundedBackground;
     }
