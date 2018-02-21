@@ -58,4 +58,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             tvSubtitle.setText(subtitle);
         }
     }
+
+    public String getIdentifierFrom(int position) {
+        String item = items.get(position);
+        String[] tokens = item.split("_");
+        return tokens[0];
+    }
 }

@@ -3,8 +3,9 @@ package adalpari.github.com.example;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -34,9 +35,9 @@ public class BubbledFastScrollerRecyclerView extends RelativeLayout {
     private AnimatorSet animShow;
     private AnimatorSet animHide;
 
-    private FastScrollerProvider provider;
+    private FastScrollerInfoProvider fastScrollerInfoProvider;
 
-    public interface FastScrollerProvider {
+    public interface FastScrollerInfoProvider {
         String getPositionTitle(int position);
     }
 
@@ -109,6 +110,7 @@ public class BubbledFastScrollerRecyclerView extends RelativeLayout {
     private void initThumb(Context context) {
         this.imageThumb = new ImageView(context);
         imageThumb.setLayoutParams(createThumbLayoutParams(context));
+        imageThumb.setVisibility(View.GONE);
 
         GradientDrawable thumbBackground = getThumbBackground();
         if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
@@ -116,11 +118,13 @@ public class BubbledFastScrollerRecyclerView extends RelativeLayout {
         } else {
             imageThumb.setBackground(thumbBackground);
         }
+
+        this.addView(imageThumb);
     }
 
     private RelativeLayout.LayoutParams createThumbLayoutParams(Context context) {
-        int width = context.getResources().getDimensionPixelOffset(R.dimen.thumb_width);;
-        int height = context.getResources().getDimensionPixelOffset(R.dimen.thumb_height);;
+        int width = context.getResources().getDimensionPixelOffset(R.dimen.thumb_width);
+        int height = context.getResources().getDimensionPixelOffset(R.dimen.thumb_height);
         final RelativeLayout.LayoutParams layoutParams = new LayoutParams(width, height);
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 
@@ -133,8 +137,8 @@ public class BubbledFastScrollerRecyclerView extends RelativeLayout {
     private GradientDrawable getThumbBackground() {
         GradientDrawable roundedBackground = new GradientDrawable();
         roundedBackground.setShape(GradientDrawable.RECTANGLE);
-        roundedBackground.setCornerRadii(new float[] { 20, 20, 20, 20, 20, 20, 0, 0 });
-//        roundedBackground.setColor(numberCounterColor);
+        roundedBackground.setCornerRadii(new float[] { 20, 20, 20, 20, 20, 20, 20, 20 });
+        roundedBackground.setColor(Color.BLUE);
 
         return roundedBackground;
     }
@@ -148,7 +152,8 @@ public class BubbledFastScrollerRecyclerView extends RelativeLayout {
         textBubble.setGravity(Gravity.RIGHT);
         textBubble.setLayoutParams(createBubbleLayoutParams(context));
         textBubble.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-//        textBubble.setTextColor(numberCounterTextColor);
+        textBubble.setTextColor(Color.WHITE);
+        textBubble.setVisibility(View.GONE);
 
         GradientDrawable roundedBackground = getBubbleBackground();
         if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
@@ -173,8 +178,8 @@ public class BubbledFastScrollerRecyclerView extends RelativeLayout {
     private GradientDrawable getBubbleBackground() {
         GradientDrawable roundedBackground = new GradientDrawable();
         roundedBackground.setShape(GradientDrawable.RECTANGLE);
-        roundedBackground.setCornerRadii(new float[] { 20, 20, 20, 20, 20, 20, 0, 0 });
-//        roundedBackground.setColor(numberCounterColor);
+        roundedBackground.setCornerRadii(new float[] { 20, 20, 20, 20, 0, 0, 20, 20 });
+        roundedBackground.setColor(Color.BLUE);
 
         return roundedBackground;
     }
@@ -208,12 +213,13 @@ public class BubbledFastScrollerRecyclerView extends RelativeLayout {
     private void showScroll(boolean showBubble) {
         showThumb();
         if (showBubble) {
-            fillBubble();
+            showBubble();
         }
     }
 
     private void hideScroll() {
         hideThumb();
+        hideBubble();
         clearBubble();
     }
 
@@ -234,11 +240,54 @@ public class BubbledFastScrollerRecyclerView extends RelativeLayout {
         }
     }
 
-    private void fillBubble() {
-        if (provider != null && textBubble != null) {
-//            String text = provider.getPositionTitle(layoutManager.findLastCompletelyVisibleItemPosition());
-//            textBubble.setVisibility(View.VISIBLE);
-//            textBubble.setText(text);
+    private void showBubble() {
+        if (fastScrollerInfoProvider != null && textBubble != null) {
+            String text = fastScrollerInfoProvider.getPositionTitle(findFirstVisibleItemPosition());
+            textBubble.setVisibility(View.VISIBLE);
+            textBubble.setText(text);
+        }
+    }
+
+    private int findFirstVisibleItemPosition() {
+        final View child = findOneVisibleChild(0, layoutManager.getChildCount(), false, true);
+        return child == null ? RecyclerView.NO_POSITION : recyclerView.getChildAdapterPosition(child);
+    }
+
+    View findOneVisibleChild(int fromIndex, int toIndex, boolean completelyVisible,
+            boolean acceptPartiallyVisible) {
+        OrientationHelper helper;
+        if (layoutManager.canScrollVertically()) {
+            helper = OrientationHelper.createVerticalHelper(layoutManager);
+        } else {
+            helper = OrientationHelper.createHorizontalHelper(layoutManager);
+        }
+
+        final int start = helper.getStartAfterPadding();
+        final int end = helper.getEndAfterPadding();
+        final int next = toIndex > fromIndex ? 1 : -1;
+        View partiallyVisible = null;
+        for (int i = fromIndex; i != toIndex; i += next) {
+            final View child = layoutManager.getChildAt(i);
+            final int childStart = helper.getDecoratedStart(child);
+            final int childEnd = helper.getDecoratedEnd(child);
+            if (childStart < end && childEnd > start) {
+                if (completelyVisible) {
+                    if (childStart >= start && childEnd <= end) {
+                        return child;
+                    } else if (acceptPartiallyVisible && partiallyVisible == null) {
+                        partiallyVisible = child;
+                    }
+                } else {
+                    return child;
+                }
+            }
+        }
+        return partiallyVisible;
+    }
+
+    private void hideBubble() {
+        if (textBubble != null) {
+            textBubble.setVisibility(View.GONE);
         }
     }
 
@@ -303,11 +352,15 @@ public class BubbledFastScrollerRecyclerView extends RelativeLayout {
         return recyclerView;
     }
 
+    public void setFastScrollerInfoProvider(FastScrollerInfoProvider fastScrollerInfoProvider) {
+        this.fastScrollerInfoProvider = fastScrollerInfoProvider;
+    }
+
     public void onDestroy() {
         recyclerView = null;
         imageThumb = null;
         textBubble = null;
-        provider = null;
+        fastScrollerInfoProvider = null;
     }
 }
 
