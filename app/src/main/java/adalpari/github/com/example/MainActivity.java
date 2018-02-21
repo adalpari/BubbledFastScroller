@@ -8,9 +8,9 @@ import android.support.v7.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements BubbledFastScrollerRecyclerView.FastScrollerInfoProvider {
+public class MainActivity extends AppCompatActivity implements BubbledFastScrollerRecyclerViewHandler.FastScrollerInfoProvider {
 
-    private BubbledFastScrollerRecyclerView bubbledFastScrollerRecyclerView;
+    private BubbledFastScrollerRecyclerViewHandler mBubbledFastScrollerRecyclerViewHandler;
     private MyAdapter myAdapter;
 
     @Override
@@ -18,15 +18,15 @@ public class MainActivity extends AppCompatActivity implements BubbledFastScroll
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        bubbledFastScrollerRecyclerView = findViewById(R.id.recycler_view);
+        mBubbledFastScrollerRecyclerViewHandler = findViewById(R.id.recycler_view);
 
         List<String> items = createListItems();
         myAdapter = new MyAdapter(items);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        bubbledFastScrollerRecyclerView.setLayoutManager(mLayoutManager);
-        bubbledFastScrollerRecyclerView.setAdapter(myAdapter);
-        bubbledFastScrollerRecyclerView.setFastScrollerInfoProvider(this);
+        mBubbledFastScrollerRecyclerViewHandler.setLayoutManager(mLayoutManager);
+        mBubbledFastScrollerRecyclerViewHandler.setAdapter(myAdapter);
+        mBubbledFastScrollerRecyclerViewHandler.setFastScrollerInfoProvider(this);
     }
 
     private List<String> createListItems() {
@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements BubbledFastScroll
 
     @Override
     protected void onDestroy() {
-        bubbledFastScrollerRecyclerView.onDestroy();
+        mBubbledFastScrollerRecyclerViewHandler.onDestroy();
         super.onDestroy();
     }
 

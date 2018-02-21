@@ -21,7 +21,7 @@ import android.widget.TextView;
  * Created by Adalberto Plaza on 17/02/2018.
  */
 
-public class BubbledFastScrollerRecyclerView extends RelativeLayout {
+public class BubbledFastScrollerRecyclerViewHandler extends RelativeLayout {
 
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
@@ -41,22 +41,22 @@ public class BubbledFastScrollerRecyclerView extends RelativeLayout {
         String getPositionTitle(int position);
     }
 
-    public BubbledFastScrollerRecyclerView(Context context) {
+    public BubbledFastScrollerRecyclerViewHandler(Context context) {
         super(context);
         initViews(context);
     }
 
-    public BubbledFastScrollerRecyclerView(Context context, AttributeSet attrs) {
+    public BubbledFastScrollerRecyclerViewHandler(Context context, AttributeSet attrs) {
         super(context, attrs);
         initViews(context);
     }
 
-    public BubbledFastScrollerRecyclerView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public BubbledFastScrollerRecyclerViewHandler(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initViews(context);
     }
 
-    public BubbledFastScrollerRecyclerView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public BubbledFastScrollerRecyclerViewHandler(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         initViews(context);
     }
