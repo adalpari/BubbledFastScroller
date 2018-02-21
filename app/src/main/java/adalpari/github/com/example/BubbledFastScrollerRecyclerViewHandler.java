@@ -41,9 +41,15 @@ public class BubbledFastScrollerRecyclerViewHandler extends RelativeLayout {
     private int bubbleTextColor = Color.WHITE;
 
     private FastScrollerInfoProvider fastScrollerInfoProvider;
+    private OnScrolledListener onScrolledListener;
 
     public interface FastScrollerInfoProvider {
         String getPositionTitle(int position);
+    }
+
+    public interface OnScrolledListener {
+        void onScrollStateChanged(RecyclerView recyclerView, int newScrollState);
+        void onScrolled(RecyclerView recyclerView, int dx, int dy);
     }
 
     public BubbledFastScrollerRecyclerViewHandler(Context context) {
@@ -99,7 +105,6 @@ public class BubbledFastScrollerRecyclerViewHandler extends RelativeLayout {
         }
     }
 
-    //TODO: check if one can pass the attributes (check with layoutmanager)
     private void initRecyclerView(Context context) {
         this.recyclerView = new RecyclerView(context);
         recyclerView.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -116,6 +121,10 @@ public class BubbledFastScrollerRecyclerViewHandler extends RelativeLayout {
                     showScroll(false);
                 }
                 oldScrollState = newScrollState;
+
+                if (onScrolledListener != null) {
+                    onScrolledListener.onScrollStateChanged(recyclerView, newScrollState);
+                }
             }
 
             @Override
@@ -123,6 +132,10 @@ public class BubbledFastScrollerRecyclerViewHandler extends RelativeLayout {
                 super.onScrolled(recyclerView, dx, dy);
                 if (!manuallyChangingPosition) {
                     updateHandlePosition(recyclerView);
+                }
+
+                if (onScrolledListener != null) {
+                    onScrolledListener.onScrolled(recyclerView, dx, dy);
                 }
             }
         });
@@ -375,6 +388,10 @@ public class BubbledFastScrollerRecyclerViewHandler extends RelativeLayout {
 
     public void setFastScrollerInfoProvider(FastScrollerInfoProvider fastScrollerInfoProvider) {
         this.fastScrollerInfoProvider = fastScrollerInfoProvider;
+    }
+
+    public void setOnScrolledListener(OnScrolledListener onScrolledListener) {
+        this.onScrolledListener = onScrolledListener;
     }
 
     public void onDestroy() {
