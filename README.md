@@ -2,7 +2,7 @@
 
 RecyclerView Fast Scroller with a bubble indicator
 
-![demo gif]()
+![demo gif](https://raw.githubusercontent.com/adalpari/BubbledFastScroller/master/media/demo.gif)
 
 # How to use
 
