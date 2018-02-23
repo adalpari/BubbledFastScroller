@@ -22,7 +22,7 @@ allprojects {
 
 ```
 dependencies {
-  implementation 'com.github.adalpari:BubbledFastScroller:1.0'
+  implementation 'com.github.adalpari:BubbledFastScroller:1.1'
 }
 ```
 
