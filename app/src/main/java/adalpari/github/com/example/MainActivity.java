@@ -12,7 +12,7 @@ import adalpari.github.com.bubbledfastscroller.BubbledFastScrollerRecyclerViewHa
 
 public class MainActivity extends AppCompatActivity {
 
-    private BubbledFastScrollerRecyclerViewHandler mBubbledFastScrollerRecyclerViewHandler;
+    private BubbledFastScrollerRecyclerViewHandler bubbledFastScrollerRecyclerViewHandler;
     private MyAdapter myAdapter;
 
     @Override
@@ -20,14 +20,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mBubbledFastScrollerRecyclerViewHandler = findViewById(R.id.recycler_view);
+        bubbledFastScrollerRecyclerViewHandler = findViewById(R.id.recycler_view);
 
         List<String> items = createListItems();
         myAdapter = new MyAdapter(items);
 
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        mBubbledFastScrollerRecyclerViewHandler.setLayoutManager(mLayoutManager);
-        mBubbledFastScrollerRecyclerViewHandler.setAdapter(myAdapter);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        bubbledFastScrollerRecyclerViewHandler.setLayoutManager(layoutManager);
+        bubbledFastScrollerRecyclerViewHandler.setAdapter(myAdapter);
     }
 
     private List<String> createListItems() {
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        mBubbledFastScrollerRecyclerViewHandler.onDestroy();
+        bubbledFastScrollerRecyclerViewHandler.onDestroy();
         super.onDestroy();
     }
 }
