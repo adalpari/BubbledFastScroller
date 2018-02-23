@@ -9,6 +9,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -40,12 +41,8 @@ public class BubbledFastScrollerRecyclerViewHandler extends RelativeLayout {
     private int bubbleColor = Color.GRAY;
     private int bubbleTextColor = Color.WHITE;
 
-    private FastScrollerInfoProvider fastScrollerInfoProvider;
+    private SectionTitleProvider sectionTitleProvider;
     private RecyclerView.OnScrollListener externalOnScrollListener;
-
-    public interface FastScrollerInfoProvider {
-        String getPositionTitle(int position);
-    }
 
 
     public BubbledFastScrollerRecyclerViewHandler(Context context) {
@@ -271,8 +268,8 @@ public class BubbledFastScrollerRecyclerViewHandler extends RelativeLayout {
     }
 
     private void showBubble() {
-        if (fastScrollerInfoProvider != null && textBubble != null) {
-            String text = fastScrollerInfoProvider.getPositionTitle(findFirstVisibleItemPosition());
+        if (sectionTitleProvider != null && textBubble != null) {
+            String text = sectionTitleProvider.getPositionTitle(findFirstVisibleItemPosition());
             textBubble.setVisibility(View.VISIBLE);
             textBubble.setText(text);
         }
@@ -371,6 +368,12 @@ public class BubbledFastScrollerRecyclerViewHandler extends RelativeLayout {
 
     public void setAdapter(RecyclerView.Adapter adapter) {
         recyclerView.setAdapter(adapter);
+
+        if (adapter instanceof SectionTitleProvider) {
+            sectionTitleProvider = (SectionTitleProvider) adapter;
+        } else {
+            Log.e("BubbledFastScroller", "RecyclerView.Adapter should implement SectionTitleProvider in order to show section bubble");
+        }
     }
 
     public void setLayoutManager(RecyclerView.LayoutManager layoutManager) {
@@ -382,10 +385,6 @@ public class BubbledFastScrollerRecyclerViewHandler extends RelativeLayout {
         return recyclerView;
     }
 
-    public void setFastScrollerInfoProvider(FastScrollerInfoProvider fastScrollerInfoProvider) {
-        this.fastScrollerInfoProvider = fastScrollerInfoProvider;
-    }
-
     public void setOnScrolledListener(RecyclerView.OnScrollListener onScrolledListener) {
         this.externalOnScrollListener = onScrolledListener;
     }
@@ -394,7 +393,7 @@ public class BubbledFastScrollerRecyclerViewHandler extends RelativeLayout {
         recyclerView = null;
         imageThumb = null;
         textBubble = null;
-        fastScrollerInfoProvider = null;
+        sectionTitleProvider = null;
 
         animShow.cancel();
         animShow.end();
@@ -403,7 +402,7 @@ public class BubbledFastScrollerRecyclerViewHandler extends RelativeLayout {
         animHide.end();
         animHide = null;
 
-        fastScrollerInfoProvider = null;
+        sectionTitleProvider = null;
         externalOnScrollListener = null;
     }
 }

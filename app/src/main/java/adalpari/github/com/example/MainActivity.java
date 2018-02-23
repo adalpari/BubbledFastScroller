@@ -10,7 +10,7 @@ import java.util.List;
 
 import adalpari.github.com.bubbledfastscroller.BubbledFastScrollerRecyclerViewHandler;
 
-public class MainActivity extends AppCompatActivity implements BubbledFastScrollerRecyclerViewHandler.FastScrollerInfoProvider {
+public class MainActivity extends AppCompatActivity {
 
     private BubbledFastScrollerRecyclerViewHandler mBubbledFastScrollerRecyclerViewHandler;
     private MyAdapter myAdapter;
@@ -28,7 +28,6 @@ public class MainActivity extends AppCompatActivity implements BubbledFastScroll
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         mBubbledFastScrollerRecyclerViewHandler.setLayoutManager(mLayoutManager);
         mBubbledFastScrollerRecyclerViewHandler.setAdapter(myAdapter);
-        mBubbledFastScrollerRecyclerViewHandler.setFastScrollerInfoProvider(this);
     }
 
     private List<String> createListItems() {
@@ -45,10 +44,5 @@ public class MainActivity extends AppCompatActivity implements BubbledFastScroll
     protected void onDestroy() {
         mBubbledFastScrollerRecyclerViewHandler.onDestroy();
         super.onDestroy();
-    }
-
-    @Override
-    public String getPositionTitle(int position) {
-        return myAdapter.getIdentifierFrom(position);
     }
 }

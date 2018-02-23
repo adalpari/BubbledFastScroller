@@ -8,11 +8,13 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import adalpari.github.com.bubbledfastscroller.SectionTitleProvider;
+
 /**
  * Created by Adalberto Plaza on 17/02/2018.
  */
 
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
+public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> implements SectionTitleProvider {
 
     private List<String> items;
 
@@ -43,6 +45,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         }
     }
 
+    @Override
+    public String getPositionTitle(int position) {
+        String item = items.get(position);
+        String[] tokens = item.split("_");
+        return tokens[0];
+    }
+
     class MyViewHolder extends RecyclerView.ViewHolder {
         private TextView tvTitle;
         private TextView tvSubtitle;
@@ -57,11 +66,5 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             tvTitle.setText(title);
             tvSubtitle.setText(subtitle);
         }
-    }
-
-    public String getIdentifierFrom(int position) {
-        String item = items.get(position);
-        String[] tokens = item.split("_");
-        return tokens[0];
     }
 }
