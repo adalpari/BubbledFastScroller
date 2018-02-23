@@ -1,4 +1,4 @@
-package adalpari.github.com.example;
+package adalpari.github.com.bubbledfastscroller;
 
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;

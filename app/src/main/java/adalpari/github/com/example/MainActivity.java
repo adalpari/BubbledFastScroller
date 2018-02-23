@@ -8,6 +8,8 @@ import android.support.v7.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+import adalpari.github.com.bubbledfastscroller.BubbledFastScrollerRecyclerViewHandler;
+
 public class MainActivity extends AppCompatActivity implements BubbledFastScrollerRecyclerViewHandler.FastScrollerInfoProvider {
 
     private BubbledFastScrollerRecyclerViewHandler mBubbledFastScrollerRecyclerViewHandler;
